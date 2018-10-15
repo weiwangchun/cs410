@@ -1,18 +1,39 @@
-# CS410 Project Proposal: Management Sentiment Analysis in SEC Filings
-
-The project aims to extract management sentiment across large capitalization American firms (eg. Dow Jones Industial Average constituents or S&P 500 constituents), 
-whose quarterly (10Q) and annual reports (10K) are available in SEC (US Securities and Exchange Commission) filings.
-Using the `manager discussion and analysis' section (MD&A) of these reports, we are able to analyze management sentiment across different firms and across time.
-We can also correlate this to stock price performance to see if there are any linkages between implicit management sentiment and future stock price
-performance.
-
-We aim to create a Python tool that allows users collect and analyze management sentiment for any input firm that has SEC filings.
-We envisage this to be useful for portfolio managers or private investors who wish to keep track of management sentiment.
+# CS410 Project Proposal: Management Sentiment Analysis in Company SEC Filings
 
 ## Team Members
 
 - Venkat Rao Bhamidipathi (vrb3)
 - Wang Chun Wei (wcwei2)
+
+
+## Introduction
+
+The project aims to extract management sentiment across large capitalization American firms (eg. Dow Jones Industial Average constituents or S&P 500 constituents), 
+whose quarterly (10Q) and annual reports (10K) are available in SEC (US Securities and Exchange Commission) filings.
+Using the 'manager discussion and analysis' section (MD&A) of these reports, we are able to analyze management sentiment across different firms and across time.
+We can also correlate this to stock price performance to see if there are any linkages between implicit management sentiment and future stock price
+performance.
+
+### Function
+
+We aim to create a Python tool that allows users collect and analyze management sentiment for any input firm that has SEC filings.
+
+### Who will benefit from such tool?
+
+We envisage this to be useful for portfolio managers or private investors who wish to keep track of management sentiment.
+This will be helpful for investors that may not have the time to read through all the documents, but simply want a high level gauge on market wide and firm wide sentiment.
+
+### Similar tools that exist
+
+Websites such as Last10K and Whalewisdom have utilized the scraping and analysis of company SEC filings for investors, alerting them of significant changes in manager holding, significant changes in reported accounting figures and general report sentiment. 
+
+Our tool is slightly different because:
+
+* It focuses specifically on sentiment in the MD&A section.
+
+* It allows users to analyse a large batch of stocks at once and compare and rank sentiment across stocks.
+
+
 
 
 ## SEC's EDGAR Database

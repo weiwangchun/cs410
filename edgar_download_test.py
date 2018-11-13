@@ -107,7 +107,6 @@ def extract_files_from_index(index_name):
 
 
 
-
 class EDGAR_file:
     # some attributes
     text_raw = None
@@ -137,7 +136,7 @@ class EDGAR_file:
         text = BeautifulSoup(self.text_raw, 'html.parser')
         self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
 
-    
+
 
 
 

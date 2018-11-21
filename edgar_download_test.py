@@ -107,35 +107,6 @@ def extract_files_from_index(index_name):
 
 
 
-class EDGAR_file:
-    # some attributes
-    text_raw = None
-    text_clean = None
-    text_mda = None
-
-    def __init__(self, filing_items):
-        (self.cik,
-        self.company_name,
-        self.form_type,
-        self.filing_date,
-        self.filing_url) = filing_items
-        self.filing_url = self.filing_url
-        self.get_file()
-        self.clean_text()
-
-    def get_file(self):
-        print('Fetching file ...')
-        try:
-            tmp = urllib.request.urlopen('http://www.sec.gov/Archives/' + self.filing_url)
-            self.text_raw = tmp.read()
-        except urllib.error:
-            print('\t failed.')
-            self.text_raw = ''
-
-    def clean_text(self):
-        text = BeautifulSoup(self.text_raw, 'html.parser')
-        self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
-
 
 
 

@@ -6,5 +6,5 @@
 		"use": "N",
 		"list": ["BOEING", "RAYTHEON", "LOCKHEED", "ROCKWELL"]
 	},
-	"start_from_line": 50
+	"start_from_line": 77
 }

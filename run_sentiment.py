@@ -13,7 +13,17 @@ from itertools import chain
 
 
 
+class SentimentAnalysis:
+	text  = None
 
+
+	def __init__(self, file_name):
+		self.file_name = file_name
+		self.get_text()
+
+
+	def get_text(self):
+		
 
 
 
@@ -23,7 +33,9 @@ if __name__ == '__main__':
     index_files = glob.glob('files/*.txt')
     for file in index_files:
         print(file)
-        open_(file)
+        tmp = SentimentAnalysis(file)
+
+
 
 
 

@@ -14,7 +14,6 @@ import glob
 import re
 import csv
 import json
-import pandas as pd
 from bs4 import BeautifulSoup
 import nltk 
 from nltk.corpus import stopwords
@@ -87,14 +86,15 @@ def extract_files_from_list(index_name, stock_list):
     filing_items = ()
 
     with open(index_name, 'r') as csv_file:
-        filings = pd.DataFrame(csv.reader(csv_file, delimiter = "|"))
+        filings = csv.reader(csv_file, delimiter = "|")
         for row in filings:
             # check if this row is relevant
             found = False
             for stock_str in stock_list:
-                tmp = re.search(stock_str, ''.join(row), re.M | re.I) 
+                tmp = re.search(stock_str, ' '.join(row), re.M | re.I) 
                 if tmp:
                     found = True
+                    continue 
             # do only if relevant
             if found:
                 for item in row:
@@ -155,7 +155,7 @@ class EDGAR_file:
                 print('MDA Trim Complete for ' + self.company_name + ' for ' + self.filing_date)
                 text = text[:trim_end.end()]
                 text = purge_stopwords(text.split())
-                self.text_mda = text
+                self.text_mda = ' '.join(text)
             else: 
                 # trim end is not complete
                 print('MDA Trim Error: No Tail. Abort MDA for ' + self.company_name + ' for ' + self.filing_date)
@@ -184,15 +184,16 @@ def purge_stopwords(text):
     return filtered_text
 
 
-
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print("Please provide start_year, end_year and download_type arguments.) \nFor Example: >python download_reports.py settings.json")
+    if len(sys.argv) != 2:
+        print("Please provide json settings file.) \nFor Example: >python download_reports.py settings.json")
         sys.exit(1)
     settings_file = sys.argv[1]
     with open(settings_file) as f:
         settings = json.load(f)   
  
+    download_type = settings['download_type']
+
     if (download_type == "all" or download_type == "index"): 
         print("Downloading index files from " + str(settings['start_year']) + " to " + str(settings['end_year']))
         download_index(settings['start_year'], settings['end_year'])

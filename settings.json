@@ -1,9 +1,9 @@
 {
 	"start_year": 2018,
 	"end_year": 2018,
-	"download_type": "all",
+	"download_type": "report",
 	"stock_list": {
-		"use": "Y",
+		"use": "N",
 		"list": ["BOEING", "RAYTHEON", "LOCKHEED", "ROCKWELL"]
 	}
 }

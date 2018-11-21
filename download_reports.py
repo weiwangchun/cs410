@@ -13,6 +13,8 @@ import urllib.error
 import glob
 import re
 import csv
+import json
+import pandas as pd
 from bs4 import BeautifulSoup
 import nltk 
 from nltk.corpus import stopwords
@@ -63,11 +65,10 @@ def extract_reports(index_file, output_file):
 # download all EDGAR files listed in the index
 def extract_files_from_index(index_name):
     filing_items = ()
-    filing_list = []
 
     # open index file as csv file - go through each row
     with open(index_name, 'r') as csv_file:
-        filings = csv.reader(csv_file, delimiter ="|")
+        filings = csv.reader(csv_file, delimiter = "|")
         for row in filings:
             for item in row:
                 filing_items += (item, )
@@ -78,11 +79,36 @@ def extract_files_from_index(index_name):
             tmp_file.write(str(tmp.text_mda))
             tmp_file.close()
 
-            #tmp.text_raw
-            #filing_list.append(tmp)
             filing_items = ()
-    #return filing_list
     return None
+
+# download all EDGAR files related to the specific stock_list
+def extract_files_from_list(index_name, stock_list):
+    filing_items = ()
+
+    with open(index_name, 'r') as csv_file:
+        filings = pd.DataFrame(csv.reader(csv_file, delimiter = "|"))
+        for row in filings:
+            # check if this row is relevant
+            found = False
+            for stock_str in stock_list:
+                tmp = re.search(stock_str, ''.join(row), re.M | re.I) == False
+                if tmp:
+                    found = True
+            # do only if relevant
+            if found:
+                for item in row:
+                    filing_items += (item, )
+                tmp = EDGAR_file(filing_items)
+
+                # Save the MDA file
+                tmp_file = open('files/' + tmp.cik + '_' + tmp.company_name + '_' + tmp.form_type + '_' +tmp.filing_date + '.txt','w')
+                tmp_file.write(str(tmp.text_mda))
+                tmp_file.close()
+
+            filing_items = ()
+    return None
+
 
 class EDGAR_file:
     text_raw = None
@@ -142,8 +168,7 @@ class EDGAR_file:
 
     def clean_company_name(self):
         # make sure we can save company name as a filename
-        self.company_name = re.sub('/','-', self.company_name)
-        self.company_name = re.sub('\*', '-', self.company_name)
+        self.company_name = re.sub('[!@#\/$]','', self.company_name)
 
 
 # Remove stop words using the nltk package
@@ -160,27 +185,29 @@ def purge_stopwords(text):
 
 
 
-
-
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print("Please provide start_year, end_year and download_type arguments. \ndownload_type: all (download all), index (download index only), report (download filing reports only) \nFor Example: >python download_reports.py 2017 2018 all")
+        print("Please provide start_year, end_year and download_type arguments.) \nFor Example: >python download_reports.py settings.json")
         sys.exit(1)
-    start_year = int(sys.argv[1])
-    end_year = int(sys.argv[2])
-    download_type = sys.argv[3] 
-
+    settings_file = sys.argv[1]
+    with open(settings_file) as f:
+        settings = json.load(f)   
+ 
     if (download_type == "all" or download_type == "index"): 
-        print("Downloading index files from " + str(start_year) + " to " + str(end_year))
-        download_index(start_year, end_year)
-        extract_from_index(start_year, end_year)
+        print("Downloading index files from " + str(settings['start_year']) + " to " + str(settings['end_year']))
+        download_index(settings['start_year'], settings['end_year'])
+        extract_from_index(settings['start_year'], settings['end_year'])
 
     if (download_type == "all" or download_type == "report"):
         # find available index files to do download
         index_files = glob.glob('10X*.idx')
         for file in index_files:
             print(file)
-            extract_files_from_index(file)
+
+            if (settings['stock_list']['use'] == "Y"):
+                extract_files_from_list(file, settings['stock_list']['list'])
+            else:
+                extract_files_from_index(file)
 
 
 

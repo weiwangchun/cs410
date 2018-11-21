@@ -15,6 +15,8 @@ from itertools import chain
 
 
 
+
+
 if __name__ == '__main__':
 
 	# find MD&A files in the directory

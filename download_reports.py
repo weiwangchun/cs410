@@ -97,6 +97,7 @@ class EDGAR_file:
         self.filing_url) = filing_items
         self.filing_url = self.filing_url
         self.get_file()
+        self.clean_company_name()
         self.clean_text()
         self.extract_mda_section()
 
@@ -137,6 +138,12 @@ class EDGAR_file:
             # trim beginning not complete
             print('MDA Trim Error: No Head. Abort MDA for ' + self.company_name + ' for ' + self.filing_date)
             self.text_mda = None
+
+
+    def clean_company_name(self):
+        # make sure we can save company name as a filename
+        self.company_name = re.sub('/','-', self.company_name)
+        self.company_name = re.sub('\*', '-', self.company_name)
 
 
 # Remove stop words using the nltk package

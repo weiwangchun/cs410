@@ -62,23 +62,27 @@ def extract_reports(index_file, output_file):
     return counter
 
 # download all EDGAR files listed in the index
-def extract_files_from_index(index_name):
+def extract_files_from_index(index_name, start_from = 1):
     filing_items = ()
 
     # open index file as csv file - go through each row
     with open(index_name, 'r') as csv_file:
         filings = csv.reader(csv_file, delimiter = "|")
+        counter = 1
         for row in filings:
-            for item in row:
-                filing_items += (item, )
-            tmp = EDGAR_file(filing_items)
 
-            # Save the MDA file
-            tmp_file = open('files/' + tmp.cik + '_' + tmp.company_name + '_' + tmp.form_type + '_' +tmp.filing_date + '.txt','w')
-            tmp_file.write(str(tmp.text_mda))
-            tmp_file.close()
+            if counter >= start_from:
+                for item in row:
+                    filing_items += (item, )
+                tmp = EDGAR_file(filing_items)
+
+                # Save the MDA file
+                tmp_file = open('files/' + tmp.cik + '_' + tmp.company_name + '_' + tmp.form_type + '_' +tmp.filing_date + '.txt','w')
+                tmp_file.write(str(tmp.text_mda))
+                tmp_file.close()
 
             filing_items = ()
+            counter = counter + 1
     return None
 
 # download all EDGAR files related to the specific stock_list
@@ -169,6 +173,7 @@ class EDGAR_file:
     def clean_company_name(self):
         # make sure we can save company name as a filename
         self.company_name = re.sub('[!@#\/$]','', self.company_name)
+        self.company_name = self.company_name.replace("\\","")
 
 
 # Remove stop words using the nltk package
@@ -208,7 +213,7 @@ if __name__ == '__main__':
             if (settings['stock_list']['use'] == "Y"):
                 extract_files_from_list(file, settings['stock_list']['list'])
             else:
-                extract_files_from_index(file)
+                extract_files_from_index(file, settings['start_from_line'])
 
 
 

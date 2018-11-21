@@ -117,10 +117,12 @@ class EDGAR_file:
     def extract_mda_section(self):
         # extract mda section from the clean filing
         text = self.text_clean
-        trim_beginning = re.search(r'item[\s\w\&\.\;\,\:]*management[\s\']*s discussion and analysis', text, re.M | re.I) #ignore case 
+        trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) # this will pick up contents page
         if trim_beginning:
             text = text[trim_beginning.end():]
-            trim_end = re.search(r'item[\s\w\&\.\;\,\:]*quantitative and qualitative', text, re.M | re.I)
+            trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) 
+            text = text[trim_beginning.end():]
+            trim_end = re.search(r'quantitative and qualitative', text, re.M | re.I)
             if trim_end:
                 # trim beginning and end complete
                 print('MDA Trim Complete for ' + self.company_name + ' for ' + self.filing_date)

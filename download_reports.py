@@ -92,7 +92,7 @@ def extract_files_from_list(index_name, stock_list):
             # check if this row is relevant
             found = False
             for stock_str in stock_list:
-                tmp = re.search(stock_str, ''.join(row), re.M | re.I) == False
+                tmp = re.search(stock_str, ''.join(row), re.M | re.I) 
                 if tmp:
                     found = True
             # do only if relevant

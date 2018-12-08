@@ -143,7 +143,9 @@ class EDGAR_file:
     def clean_text(self):
         # clean filing
         text = BeautifulSoup(self.text_raw, 'html.parser')
+        #text =[''.join(s.findAll(text=True))for s in soup.findAll('h1', 'time')]
         self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
+        self.text_clean = re.sub('\n', ' ', self.text_clean)
 
     def extract_mda_section(self):
         # extract mda section from the clean filing

@@ -18,11 +18,15 @@ import urllib.error
 
 # download master index files from EDGAR (quarterly files)
 def download_index(start_year, end_year):
+    tmp_filename = 'index_files/master.idx'
+
     for year in range(start_year, end_year + 1):
+        if os.path.exists(tmp_filename):
+            os.remove(tmp_filename)
+
         for qtr in range(1, 5):
             idx_url = 'https://www.sec.gov/Archives/edgar/full-index/' + str(year) + '/QTR' + str(qtr) + '/master.idx'
             copy_filename = 'index_files/' + str(year) + 'QTR' + str(qtr) + '.idx'
-            tmp_filename = 'index_files/master.idx'
             print('Downloading ' + str(year) + ' Q' + str(qtr) + ' master index.')
             try:
                 response = urllib.request.urlopen(idx_url)
@@ -58,7 +62,6 @@ def extract_reports_10k10q(index_file, output_file):
                 counter  = counter + 1
     return counter
 
-
 # extract 13F filings
 def extract_reports_13f(index_file, output_file):
     counter = 0
@@ -69,6 +72,20 @@ def extract_reports_13f(index_file, output_file):
                 output_file.write(line)
                 counter  = counter + 1
     return counter
+
+# clean up
+# we only need 10X files - delete the master index files as they can get quite big
+def clean_up(start_year, end_year):
+    for year in range(start_year, end_year + 1):
+        for qtr in range(1, 5):
+            del_filename = 'index_files/' + str(year) + 'QTR' + str(qtr) + '.idx'
+
+            if os.path.exists(del_filename):
+                os.remove(del_filename)
+            else:
+                print(del_filename + " does not exist.")
+
+    return None
 
 
 
@@ -83,3 +100,5 @@ if __name__ == '__main__':
     print("Downloading index files from Q1 " + str(start_year) + " to Q4 " + str(end_year) + "\nSaved in folder index_files\n")
     download_index(start_year, end_year)
     extract_from_index(start_year, end_year)
+    clean_up(start_year, end_year)
+

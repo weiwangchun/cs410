@@ -5,7 +5,7 @@
 # Output is an index of 10k 10q reports for a selected companies
 # ----------------------------------------------------------------------------
 
-
+import sys
 import csv
 
 # extract list of stocks that we will analyse
@@ -22,10 +22,8 @@ def get_selected_filings(stock_file, index_file):
     index_filings = []
     with open(index_file, 'r') as csv_file:
         filings = csv.reader(csv_file, delimiter = "|")
-
         for row in filings:
-            for stock in stock_list:
-                index_filings.append(row)
+            index_filings.append(row)
 
     stock_list_cik = [x[0] for x in stock_list]
 
@@ -75,7 +73,6 @@ def print_selected_filings(selected_index_filings):
     return None
 
 
-
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("Please provide stock_list and master_index_file. \nFor Example: >python filter_index.py stock_list_illinois.csv index_files/10X-2018-2018.idx \n")
@@ -87,8 +84,7 @@ if __name__ == '__main__':
     selected_index_filings = get_selected_filings(stock_file, index_file)
     # generate new index with filings of stocks that we are interested in, based on stock_list
     print_selected_filings(selected_index_filings)
-
-    verify_stock_list(stock_file, selected_index_filings)
+    # verify_stock_list(stock_file, selected_index_filings)
 
 
 

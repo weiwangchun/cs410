@@ -21,10 +21,16 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize 
 import pandas as pd
+import numpy as np
+import metapy
+
 
 
 # download all EDGAR files listed in the index
-def extract_files_from_index(index_name, start_from = 1):
+# returns a list of mda featues and classification
+def extract_mda_from_index(index_name, start_from = 1, write_files = True):
+    
+    mda = []
     filing_items = ()
 
     # open index file as csv file - go through each row
@@ -38,18 +44,22 @@ def extract_files_from_index(index_name, start_from = 1):
                     filing_items += (item)
 
                 tmp = EDGAR_file(filing_items)
+                tmp.
 
                 # Save the MDA file
-                tmp_file = open('stock_files/mda_reports/' + tmp.cik + '_' + tmp.company_name + '_' + tmp.form_type + '_' +tmp.filing_date + '.txt','w')
-                tmp_file.write(str(tmp.text_mda))
-                tmp_file.close()
+                if write_files == True:
+                    tmp_file = open('stock_files/mda_reports/' + tmp.cik + '_' + tmp.company_name + '_' + tmp.form_type + '_' +tmp.filing_date + '.txt','w')
+                    tmp_file.write(str(tmp.text_mda))
+                    tmp_file.close()
 
             filing_items = ()
             counter = counter + 1
-    return None
+    return mda
+
 
 
 # Remove stop words using the nltk package
+# we use this the class EDGAR_file
 def purge_stopwords(text):
     try:
         stop_words = stopwords.words('english')
@@ -66,6 +76,8 @@ class EDGAR_file:
     text_raw = None
     text_clean = None
     text_mda = None
+    rating = 'Neutral'
+    market_sentiment ='Neutral'
 
     def __init__(self, filing_items):
         (self.cik,
@@ -80,6 +92,7 @@ class EDGAR_file:
         self.extract_mda_section()
         self.get_ticker()
         self.get_CAR()
+        self.run_sentiment()
 
     def get_file(self):
         #  get filing from SEC EDGAR database
@@ -92,9 +105,9 @@ class EDGAR_file:
 
 
     def get_ticker(self):
-    	# get ticker from cik using CIK_TICKER_MAP
-    	tmp = CIK_TICKER_MAP[CIK_TICKER_MAP['CIK'] == self.cik]
-    	self.ticker = tmp.Ticker[1]
+        # get ticker from cik using CIK_TICKER_MAP
+        tmp = CIK_TICKER_MAP[CIK_TICKER_MAP['CIK'] == self.cik]
+        self.ticker = tmp.Ticker[1]
 
 
     def clean_text(self):
@@ -134,24 +147,48 @@ class EDGAR_file:
         self.company_name = self.company_name.replace("\\","")
 
     def get_CAR(self):
-    	# using self.ticker and EXCESSRET get cumulative abnormal returns
-    	# check stock market reaction after 1 day and after 5 days
-    	tmp = EXCESSRET[["Date", self.ticker]]
-    	tmp = tmp[tmp["Date"] > self.filing_date]
-    	self.CAR1 = tmp.iloc[0, 1]	# 1 day cumulative abnormal returns
-    	self.CAR5 = sum(tmp.iloc[0:5, 1])	# 5 day cumulative abnormal returns
-    	self.CAR10 = sum(tmp.iloc[0:10, 1])
-
-    def run_BOW_sentiment(self):
-    	# run bag of words (BOW) sentiment score
-
-
-
-
+        # using self.ticker and EXCESSRET get cumulative abnormal returns
+        # check stock market reaction after 1 day and after 5 days
+        tmp = EXCESSRET[["Date", self.ticker]]
+        tmp = tmp[tmp["Date"] > self.filing_date]
+        self.CAR1 = tmp.iloc[0, 1]  # 1 day cumulative abnormal returns
+        self.CAR5 = sum(tmp.iloc[0:5, 1])   # 5 day cumulative abnormal returns
+        self.CAR10 = sum(tmp.iloc[0:10, 1])
+        # let us use CAR5 to be market setiment
+        if (self.CAR5 > 0):
+            self.market_sentiment= 'Positive'
+        else:
+            self.market_sentiment= 'Negative'
 
 
+    def tokenize(self):
+        # get word list for self.text_mda
+        word_list= []
+        doc = metapy.index.Document()
+        doc.content(self.text_mda)
+        tok= metapy.analyzers.ICUTokenizer()
+        tok= metapy.analyzers.LowercaseFilter(tok)
+        tok = metapy.analyzers.LengthFilter(tok, min=2, max=30)
+        tok.set_content(doc.content())
+        tokens = [word_list.append(token.upper()) for token in tok]
+        self.word_list
 
-
+    def run_sentiment(self):
+        # run bag of words sentiment score
+        # get word list
+        tokenize()
+        # get sentiment rating:  - in the future consider "uncertainty", "litigious", "superfluous" and other dimensions
+        matches = MASTER_DICT.loc[MASTER_DICT['Word'].isin(self.word_list)]
+        negative_words = matches.loc[matches['Negative']!=0]['Word']
+        positive_words = matches.loc[matches['Positive']!=0]['Word']
+        negative_matches = np.sum(matches['Negative'] !=0)
+        positive_matches = np.sum(matches['Positive'] !=0)
+        if (negative_matches <= positive_matches):
+            self.rating= 'Positive'
+        else:
+            self.rating= 'Negative'
+        
+        return None
 
 
 
@@ -167,6 +204,8 @@ if __name__ == '__main__':
     CIK_TICKER_MAP = pd.read_csv(stock_file)
     # stock excess returns
     EXCESSRET = pd.read_csv('stock_files/ExcessRet_of_' + stock_file)
+    # downloard master dictionary
+    MASTER_DICT = pd.read_excel("master_dictionary.xlsx")
 
 
     # stock_files/ExcessRet_of_stock_file provides us with the excess returns 

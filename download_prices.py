@@ -43,11 +43,13 @@ def get_market_return(stock_list, start_date, end_date):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        print("Please provide stock_file, start_date and end_date. \nFor Example: >python download_prices.py stock_list_illinois.csv '2017-01-01' '2018-12-01'")
+        sys.exit(1)
 
     stock_file = sys.argv[1]
-    start_date = sys.argv[2]
-    end_date = sys.argv[3]
-
+    start_date = str(sys.argv[2])
+    end_date = str(sys.argv[3])
 
     # use Wharton WRDS to get stock prices
     db = wrds.Connection()

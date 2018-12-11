@@ -66,7 +66,7 @@ def print_selected_filings(selected_index_filings):
     result_index = 'index_files/selected_filings.idx'
     file_out = open(result_index, 'w') # open file 
     for filing in selected_index_filings:
-        file_out.write(','.join(filing))
+        file_out.write('|'.join(filing))
         file_out.write('\n')
     file_out.close()   
 

@@ -23,7 +23,7 @@ from nltk.tokenize import word_tokenize
 import pandas as pd
 import numpy as np
 import metapy
-
+import pickle
 
 
 # download all EDGAR files listed in the index
@@ -31,6 +31,7 @@ import metapy
 def extract_mda_from_index(index_name, start_from = 1, write_files = True):
     
     mda = []
+    summary = []
     filing_items = ()
 
     # open index file as csv file - go through each row
@@ -41,10 +42,13 @@ def extract_mda_from_index(index_name, start_from = 1, write_files = True):
 
             if counter >= start_from:
                 for item in row:
-                    filing_items += (item)
+                    filing_items += (item, )
 
+                print(filing_items)    
                 tmp = EDGAR_file(filing_items)
-                tmp.
+
+                mda.append((tmp.word_list, tmp.market_sentiment))
+                summary.append((tmp.cik, tmp.ticker, tmp.company_name, tmp.rating, tmp.market_sentiment ))
 
                 # Save the MDA file
                 if write_files == True:
@@ -52,10 +56,21 @@ def extract_mda_from_index(index_name, start_from = 1, write_files = True):
                     tmp_file.write(str(tmp.text_mda))
                     tmp_file.close()
 
+                    with open('stock_files/mda_reports/mda.pickle', 'wb') as f:
+                        pickle.dump(mda, f)
+
             filing_items = ()
             counter = counter + 1
-    return mda
 
+        if write_files == True:
+            tmp_file = open('stock_files/' + 'summary.csv','w')
+            for x in summary:
+                tmp_file.write(','.join( x ))
+                tmp_file.write('\n')
+            tmp_file.close()         
+
+    return mda
+# use mda for classifer
 
 
 # Remove stop words using the nltk package
@@ -91,8 +106,9 @@ class EDGAR_file:
         self.clean_text()
         self.extract_mda_section()
         self.get_ticker()
-        self.get_CAR()
         self.run_sentiment()
+        self.get_CAR()
+        
 
     def get_file(self):
         #  get filing from SEC EDGAR database
@@ -106,8 +122,8 @@ class EDGAR_file:
 
     def get_ticker(self):
         # get ticker from cik using CIK_TICKER_MAP
-        tmp = CIK_TICKER_MAP[CIK_TICKER_MAP['CIK'] == self.cik]
-        self.ticker = tmp.Ticker[1]
+        tmp = CIK_TICKER_MAP[CIK_TICKER_MAP['CIK'] == int(self.cik)]
+        self.ticker = tmp.Ticker.iloc[0]
 
 
     def clean_text(self):
@@ -116,15 +132,19 @@ class EDGAR_file:
         #text =[''.join(s.findAll(text=True))for s in soup.findAll('h1', 'time')]
         self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
         self.text_clean = re.sub('\n', ' ', self.text_clean)
+        self.text_clean = self.text_clean.replace('\\n','')
 
     def extract_mda_section(self):
         # extract mda section from the clean filing
         text = self.text_clean
-        trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) # this will pick up contents page
+        #trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) # this will pick up contents page
+        trim_beginning = re.search(r'discussion and analysis of financial', text, re.M | re.I)
         if trim_beginning:
             text = text[trim_beginning.end():]
-            trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) 
-            text = text[trim_beginning.end():]
+            #trim_beginning = re.search(r'management[\s\']*s discussion and analysis', text, re.M | re.I) 
+            trim_beginning = re.search(r'discussion and analysis of financial', text, re.M | re.I)
+            if trim_beginning:
+                text = text[trim_beginning.end():]
             trim_end = re.search(r'quantitative and qualitative', text, re.M | re.I)
             if trim_end:
                 # trim beginning and end complete
@@ -135,11 +155,18 @@ class EDGAR_file:
             else: 
                 # trim end is not complete
                 print('MDA Trim Error: No Tail. Abort MDA for ' + self.company_name + ' for ' + self.filing_date)
-                self.text_mda = None
+                self.text_mda = text
+                tmp_file = open('stock_files/mda_reports/error_' + self.cik + '_' + self.company_name + '_' + self.form_type + '_' + self.filing_date + '.txt','w')
+                tmp_file.write(str(self.text_raw))
+                tmp_file.close()
+
         else:
             # trim beginning not complete
             print('MDA Trim Error: No Head. Abort MDA for ' + self.company_name + ' for ' + self.filing_date)
-            self.text_mda = None
+            self.text_mda = 'Neutral Text'
+            tmp_file = open('stock_files/mda_reports/error_' + self.cik + '_' + self.company_name + '_' + self.form_type + '_' + self.filing_date + '.txt','w')
+            tmp_file.write(str(self.text_raw))
+            tmp_file.close()
 
     def clean_company_name(self):
         # make sure we can save company name as a filename
@@ -149,16 +176,21 @@ class EDGAR_file:
     def get_CAR(self):
         # using self.ticker and EXCESSRET get cumulative abnormal returns
         # check stock market reaction after 1 day and after 5 days
-        tmp = EXCESSRET[["Date", self.ticker]]
-        tmp = tmp[tmp["Date"] > self.filing_date]
-        self.CAR1 = tmp.iloc[0, 1]  # 1 day cumulative abnormal returns
-        self.CAR5 = sum(tmp.iloc[0:5, 1])   # 5 day cumulative abnormal returns
-        self.CAR10 = sum(tmp.iloc[0:10, 1])
-        # let us use CAR5 to be market setiment
-        if (self.CAR5 > 0):
-            self.market_sentiment= 'Positive'
-        else:
-            self.market_sentiment= 'Negative'
+        try: 
+            tmp = EXCESSRET[["Date", self.ticker]]
+            tmp = tmp[tmp["Date"] > self.filing_date]
+            self.CAR1 = tmp.iloc[0, 1]  # 1 day cumulative abnormal returns
+            self.CAR5 = sum(tmp.iloc[0:5, 1])   # 5 day cumulative abnormal returns
+            self.CAR10 = sum(tmp.iloc[0:10, 1])
+            # let us use CAR5 to be market setiment
+            if (self.CAR5 > 0):
+                self.market_sentiment= 'Positive'
+            else:
+                self.market_sentiment= 'Negative'
+        except:
+            print("CAR was not found!\n")
+            self.market_sentiment = self.rating # if car not available, use BOW sentiment
+        return None
 
 
     def tokenize(self):
@@ -171,12 +203,13 @@ class EDGAR_file:
         tok = metapy.analyzers.LengthFilter(tok, min=2, max=30)
         tok.set_content(doc.content())
         tokens = [word_list.append(token.upper()) for token in tok]
-        self.word_list
+        self.word_list = word_list
+
 
     def run_sentiment(self):
         # run bag of words sentiment score
-        # get word list
-        tokenize()
+
+        self.tokenize()
         # get sentiment rating:  - in the future consider "uncertainty", "litigious", "superfluous" and other dimensions
         matches = MASTER_DICT.loc[MASTER_DICT['Word'].isin(self.word_list)]
         negative_words = matches.loc[matches['Negative']!=0]['Word']
@@ -187,7 +220,6 @@ class EDGAR_file:
             self.rating= 'Positive'
         else:
             self.rating= 'Negative'
-        
         return None
 
 
@@ -209,6 +241,8 @@ if __name__ == '__main__':
 
 
     # stock_files/ExcessRet_of_stock_file provides us with the excess returns 
-    extract_files_from_index(selected_filings)
+    mda = extract_mda_from_index(selected_filings, start_from = 120)
 
 
+
+    # Note: when break run, make sure change pickle name - join later for sentiment analysis

@@ -78,14 +78,25 @@ The resulting file will be saved as 'index_files/selected_filings.idx'
 ### 3. Downloading Returns with `download_prices.py` 
 
 Since the end goal is to run sentiment analysis to predict stock market reactions to filing reports, we need to know the subsequent stock market price associated with the report announcement.
-`download_prices.py` 
+`download_prices.py` is to download total returns and excess returns over the index for a given stock list.
 
-
-
-
+To get total and excess returns for all IL based firms from 1st Jan 2017 to 1st Dec 2018 would be as follows: 
 ```
 >python download_prices.py stock_list_illinois.csv '2017-01-01' '2018-12-01'
 ```
+Excess returns is used to calculate cumulative abnormal returns (CAR). https://en.wikipedia.org/wiki/Abnormal_return
+This is used to determine market reaction to an event (10K or 10Q annoucement).
+
+Note: This function requires users to have a Wharton WRDS account (https://wrds-web.wharton.upenn.edu/wrds/), as the data is pulled for there. It also uses the `wrds` Python package.
+For testers / users with no WRDS account, in the `stock_files` folder, we have already downloaded the returns data for Illinois based stocks, so you can continue.
+
+
+
+### 4. Extracting MDA section using `download_mda.py`
+
+
+
+
 
 
 ## Introduction

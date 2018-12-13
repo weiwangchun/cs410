@@ -91,8 +91,35 @@ Note: This function requires users to have a Wharton WRDS account (https://wrds-
 For testers / users with no WRDS account, in the `stock_files` folder, we have already downloaded the returns data for Illinois based stocks, so you can continue.
 
 
+### 4. Extracting MD&A section using `download_mda.py`
 
-### 4. Extracting MDA section using `download_mda.py`
+Once we the have `selected_filings.idx` from step 2, we can go and download the reports. 
+Since the reports are in html format, we use a html parser in beautifulsoup.
+We then clean the text, removing any remaining  `\n` and then we isolate the MD&A (manager discussion and analysis) section of the filing.
+We only keep the MD&A section. This is achieved by using `re.search` to find the string `discussion and analysis of financial`.
+As these reports are fairly standardized, the 2nd occurance of this string pattern usually begins the MD&A section (the 1st occurance is in the contents page).
+The MD&A section ends when the report begins to talk about 	`quantitative and qualitative` risk factors.
+Generally this works well in isolating the MD&A section, although the accuracy is circa 90%.
+Once we obtain the MD&A text, we tokenize and run bag-of-words sentiment based on the master dictionary provided by Loughran McDonald Financial Dictionary https://sraf.nd.edu/textual-analysis/.
+Using the filing date, we also run sentiment based on cumulative abnormal returns (CAR) of the stock after filing date.
+We argue that if the MD&A section is upbeat and positive, the cumulative abormal returns (CAR) in the market should be positive too and vice versa.
+The true sentiment score is based on a 5 day CAR.
+
+We save a list of tokenized MD&As and their respective sentiment (positive or negative) based on market reaction (5 day CAR). This is saved in `stock_files/mda_reports/mda.pickle`.
+
+To run our selected filings based on our Illinois stock, we weould do the following. We specify the index file and the stock_list file.
+
+```
+>python download_mda.py index_files/selected_filings.idx stock_list_illinois.csv
+```
+
+The results from this is actually saved in `mda_illinois.pickle`. This pickle contains the data to train and test our sentiment classifiers.
+
+### 5. Run sentiment using `run_sentiment.py`
+
+
+
+
 
 
 

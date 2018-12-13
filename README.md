@@ -13,9 +13,64 @@ and mutual fund disclosures. We focus on the 10Q and 10K reports because they ou
 In particular, we focus on the management discussion and analysis (MD&A) section which is the most subjective section of these accounting reports.
 Unlike financial statements, the MD&A section conatins valuable information on management's comments regarding the future of the business.
 
+## Objective
 
+The main objective is to classify MD&A sentiment as being positive or negative. Positive and negative can be determined either via counting positive or negative words from dictionary or by examining cumulative abnormal returns (the market reaction) to the MD&A announcement.  We attempt to use 6 different machine learning algorithms to predict the market reaction using word features.
+
+
+We have 5 main code files
+* `download_index.py`  - download's 10K 10Q index (inputs: specify years)
+* `filter_index.py` - narrow down items to those relating to user's stock list (inputs: stock list, master_index)
+* `download_prices.py` - download stock returns (user requires Wharton WRDS access)
+* `download_mda.py` - finds mda section, builds test and training data set (inputs: selected_index, stock_returns)
+* `run_sentiment.py` - runs 6 different classifers to predict market sentiment following MD&A announcement
+
+
+Key Python packages required:
+* metapy
+* nltk
+* pandas
+* numpy
+* wrds
 
 ## Demo 
+
+`stock_list_illinois.csv` provides you with a list of Illinois based companies that we analyzed. 
+After running `download_index.py` and `filter_index.py`, we generated `selected_filings.idx`. This has all the filings for 2017-2018 for IL based firms.
+
+To rerun this:
+```
+>python download_index.py 2017 2018
+>python filter_index.py stock_list_illinois.csv index_files/10X-2017-2018.idx 
+
+```
+
+We download prices for `stock_list_illinois.csv` using 
+```
+>python download_prices.py stock_list_illinois.csv '2017-01-01' '2018-12-01'
+```
+You won't be able to do this without a Wharton WRDS account. In any case, I've saved the results in `stock_files/`.
+
+After running `download_prices.py` , we run 
+
+```
+>python download_mda.py index_files/selected_filings.idx stock_list_illinois.csv
+```
+to get a mda.pickle file with all the tokenized MDA word lists and sentiment scores. This takes a very long time! (i.e., more than 5 or 6 hours)
+I've put a smaller index file with only 4 entries for your testing purposes. You can run this instead.
+```
+>python download_mda.py index_files/test_selected_filings.idx stock_list_illinois.csv
+```
+The mda.pickle and respective company MDA texts will be save in `stock_files\mda_reports`
+
+the mda.pickle contains the word lists and sentiment scores for training and testing purpose in building sentiment classifiers.
+We can run this using:
+
+```
+>python run_sentiment.py mda.pickle 0.80
+```
+0.8 is the portion of the observations used for training. The remaining observations are more testing.
+Output shows different classifers accuracy, precision, recall and f1 score. The classifiers are save in `stock_files/mda_reports/classifier.pickle`.
 
 
 

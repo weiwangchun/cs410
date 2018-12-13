@@ -246,7 +246,7 @@ if __name__ == '__main__':
 
 
     # stock_files/ExcessRet_of_stock_file provides us with the excess returns 
-    mda = extract_mda_from_index(selected_filings, start_from = 129)
+    mda = extract_mda_from_index(selected_filings, start_from = 1)
 
 
 

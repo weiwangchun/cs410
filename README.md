@@ -35,6 +35,12 @@ Key Python packages required:
 
 ## Demo 
 
+Run `demo.bat` for a small demo.
+
+
+###Demo in detail:
+
+
 `stock_list_illinois.csv` provides you with a list of Illinois based companies that we analyzed. 
 After running `download_index.py` and `filter_index.py`, we generated `selected_filings.idx`. This has all the filings for 2017-2018 for IL based firms.
 

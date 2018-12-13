@@ -18,7 +18,7 @@ This projects extracts management discussion and analysis (MD&A) sections of tex
 
 The project is broken several files based on the steps involved conducting sentiment analysis on SEC filings.
 
-### Downloading Index File from EDGAR
+### 1. Downloading Index File from EDGAR with `download_index.py`
 
 This python file extracts the quarterly master index files from EDGAR.
 It then isolates the 10K and 10Q reports from the master index as saves it in a news index file. 
@@ -48,7 +48,7 @@ CIK|Company Name|Form Type|Date Filed|Filename
 CIK are unique company identifiers used by the SEC. The index file also provides company name, date, form type and filename.
 
 
-### Filtering Index File Based on a Stock List
+### 2. Filtering Index File Based on a Stock List with `filter_index.py`
 
 The EDAGR indices provide us with filings of all the listed companies in the US. 
 Running sentiment analysis on all the companies by downloading and reading through their annual (10K) and quarterly (10Q) reports will take a very long time.
@@ -72,6 +72,20 @@ To filter all the 10Q and 10K reports for ones that are based in Illinois, we wo
 >python filter_index.py stock_list_illinois.csv index_files/10X-2017-2018.idx
 ```
 
+The resulting file will be saved as 'index_files/selected_filings.idx'
+
+
+### 3. Downloading Returns with `download_prices.py` 
+
+Since the end goal is to run sentiment analysis to predict stock market reactions to filing reports, we need to know the subsequent stock market price associated with the report announcement.
+`download_prices.py` 
+
+
+
+
+```
+>python download_prices.py stock_list_illinois.csv '2017-01-01' '2018-12-01'
+```
 
 
 ## Introduction

@@ -6,7 +6,12 @@ Final Project CS410, UIUC
 
 ## Introduction
 
-This projects extracts management discussion and analysis (MD&A) sections of text from corporate 10K and 10Q filings from the SEC EDGAR database.
+This projects extracts management discussion and analysis (MD&A) sections of text from corporate 10K and 10Q filings from the EDGAR database.
+The EDGAR (Electronic Data Gathering, Analysis, and Retrieval) database is managed by the SEC and contains
+public disclosure data regarding company quarterly (10Q) and annual reports (10K) as well as substantial holdings notices,
+and mutual fund disclosures. We focus on the 10Q and 10K reports because they outline the financial performance of the firm.
+In particular, we focus on the management discussion and analysis (MD&A) section which is the most subjective section of these accounting reports.
+Unlike financial statements, the MD&A section conatins valuable information on management's comments regarding the future of the business.
 
 
 
@@ -103,95 +108,35 @@ Generally this works well in isolating the MD&A section, although the accuracy i
 Once we obtain the MD&A text, we tokenize and run bag-of-words sentiment based on the master dictionary provided by Loughran McDonald Financial Dictionary https://sraf.nd.edu/textual-analysis/.
 Using the filing date, we also run sentiment based on cumulative abnormal returns (CAR) of the stock after filing date.
 We argue that if the MD&A section is upbeat and positive, the cumulative abormal returns (CAR) in the market should be positive too and vice versa.
-The true sentiment score is based on a 5 day CAR.
+Our `true` sentiment score is based on a 5 day CAR, i.e. this is what we're trying to predict in our model.
 
 We save a list of tokenized MD&As and their respective sentiment (positive or negative) based on market reaction (5 day CAR). This is saved in `stock_files/mda_reports/mda.pickle`.
 
-To run our selected filings based on our Illinois stock, we weould do the following. We specify the index file and the stock_list file.
+To run our selected filings based on our Illinois stocks, we would do the following. We specify the index file and the stock_list file.
 
 ```
 >python download_mda.py index_files/selected_filings.idx stock_list_illinois.csv
 ```
 
 The results from this is actually saved in `mda_illinois.pickle`. This pickle contains the data to train and test our sentiment classifiers.
+You can open pickle to have a look at the list
+
+```
+    with open('stock_files/mda_reports/mda_illinois.pickle','rb') as f:
+        mda = pickle.load(f)
+```
+
+We have collected 445 MD&As and their respective stock market reactions. (Ideally we would like to run is for a lot more observations, but 445 still illustrates the point.)
+
 
 ### 5. Run sentiment using `run_sentiment.py`
 
+Now we can run sentiment analysis using 6 different types of classifiers (Naive Bayes, Multinomial Naive Bayes, Bernoulli Naive Bayes, Losistic Regression, Stochastic Gradient Descent, Linear SVC) from the nltk package in Python.
 
 
 
-
-
-
-
-
-
-## Introduction
-
-The project aims to extract management sentiment across large capitalization American firms (eg. Dow Jones Industial Average constituents or S&P 500 constituents), 
-whose quarterly (10Q) and annual reports (10K) are available in SEC (US Securities and Exchange Commission) filings.
-Using the 'manager discussion and analysis' section (MD&A) of these reports, we are able to analyze management sentiment across different firms and across time.
-
-### SEC's EDGAR Database
-
-The EDGAR (Electronic Data Gathering, Analysis, and Retrieval) database is managed by the SEC and contains
-public disclosure data regarding company quarterly (10Q) and annual reports (10K) as well as substantial holdings notices,
-and mutual fund disclosures.
-We focus on the 10Q and 10K reports that outline the financial performance of the firm.
-In particular, we focus on the management discussion and analysis (MD&A) section which is the most subjective section of these accounting reports.
-Unlike financial statements, the MD&A section conatins valuable information on management's comments regarding the future of the business.
-
-## Project Proposal Details
-
-### Function
-
-We aim to create a Python tool that allows users collect and analyze management sentiment for any input firm (or list of firms) that has SEC filings.
-
-### Who will benefit from such tool?
-
-We envisage this to be useful for portfolio managers or private investors who wish to keep track of management sentiment.
-This will be helpful for investors that may not have the time to read through all the documents, but simply want a high level gauge on market wide and firm wide sentiment.
-
-### Similar tools that exist
-
-Websites such as Last10K and Whalewisdom have utilized the scraping and analysis of company SEC filings for investors, alerting them of significant changes in manager holding, significant changes in reported accounting figures and general report sentiment. 
-
-Our tool is slightly different because:
-
-* It focuses specifically on sentiment in the MD&A section.
-
-* It allows users to analyse a large batch of stocks at once and compare and rank sentiment across stocks.
-
-
-### Resources, Techniques and Algorithms used
-
-We will use bag-of-words representation on the MD&A section.
-
-For calculating sentiment, we will leverage off existing dictionaries and sentiment word lists in 
-Loughran and McDonald (Journal of Finance, 2011) (https://sraf.nd.edu/textual-analysis/resources/).
-
-This will allow us to measure sentiment categories in Loughran and McDonald: such as negative, postive, uncertainity, litigious, modal and constraining.
-
-Further, we can use some machine learning classification algorithm to determine a final positive and negative prediction using the sentiment scores determined above. 
-
-We will evaluate our tool by tabulating a confusion matrix and determining the accuracy of our classification algorithm.
-
-
-## Steps and Deliverables
-
-The activities required to complete the project is as follows:
-
-- Aided by EDGAR's master index file, we can download the 10Q and 10K files of a given company name or ticker and date range.
-- Extract the MD&A component from the 10Q and 10K files
-- Conduct sentiment analysis on the MD&A sections using “Bag-of-words” approach
-    * Input:  Name of the firm
-    * Output: Sentiment score
-      The process identifies positive and negative words (or a string of words) within an article. For this, it makes use of a large  dictionary which contains words that carry sentiment.  Each word in this dictionary can be assigned a weight. The sum of the positive and negative words is the final sentiment score generated by the model.
-
-
-A rough timeline is provided below:
-
-- Design: October 28th
-- Development: November 18th
-- Testing: December 1st
+For instance, 
+```
+ >python run_sentiment.py mda.pickle 0.80
+```
 

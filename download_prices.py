@@ -13,7 +13,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 from matplotlib import style
 import pandas as pd
-import pandas_datareader.data as web
+#import pandas_datareader.data as web
 
 
 # extract list of stocks that we will obtain prices for

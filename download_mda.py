@@ -58,6 +58,7 @@ def extract_mda_from_index(index_name, start_from = 1, write_files = True):
 
                     with open('stock_files/mda_reports/mda.pickle', 'wb') as f:
                         pickle.dump(mda, f)
+                    f.close()
 
             filing_items = ()
             counter = counter + 1
@@ -128,11 +129,15 @@ class EDGAR_file:
 
     def clean_text(self):
         # clean filing
-        text = BeautifulSoup(self.text_raw, 'html.parser')
-        #text =[''.join(s.findAll(text=True))for s in soup.findAll('h1', 'time')]
-        self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
-        self.text_clean = re.sub('\n', ' ', self.text_clean)
-        self.text_clean = self.text_clean.replace('\\n','')
+        try:
+            text = BeautifulSoup(self.text_raw, 'html.parser')
+            #text =[''.join(s.findAll(text=True))for s in soup.findAll('h1', 'time')]
+            self.text_clean = re.sub(r'[^\x00-\x7F]+|\W{2,}', ' ', text.document.get_text())
+            self.text_clean = re.sub('\n', ' ', self.text_clean)
+            self.text_clean = self.text_clean.replace('\\n','')
+        except:
+            self.text_clean = 'Neutral Text'
+
 
     def extract_mda_section(self):
         # extract mda section from the clean filing
@@ -241,7 +246,7 @@ if __name__ == '__main__':
 
 
     # stock_files/ExcessRet_of_stock_file provides us with the excess returns 
-    mda = extract_mda_from_index(selected_filings, start_from = 120)
+    mda = extract_mda_from_index(selected_filings, start_from = 129)
 
 
 

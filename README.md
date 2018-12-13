@@ -1,9 +1,44 @@
-# CS410 Project Proposal: Management Sentiment Analysis in Company SEC Filings
+# Management Sentiment Analysis in Company SEC Filings
 
-## Team Members
-
-- Venkat Rao Bhamidipathi (vrb3)
+Final Project CS410, UIUC
 - Wang Chun Wei (wcwei2)
+- Venkat Rao Bhamidipathi (vrb3)
+
+## Introduction
+
+This projects extracts management discussion and analysis (MD&A) sections of text from corporate 10K and 10Q filings from the SEC EDGAR database.
+
+
+
+## Demo 
+
+
+
+## Code Files
+
+The project is broken several files based on the steps involved conducting sentiment analysis on SEC filings.
+
+### Downloading Index File from EDGAR
+This python file extracts the quarterly master index files from EDGAR.
+It then isolates the 10K and 10Q reports from the master index as saves it in a news index file. 
+Finally, it cleans up existing master index files from the directory, as they get quite big.
+
+For example:
+```
+# downloading master index Q1 2017 to Q4 2018
+python download_index.py  2017 2018
+# downloading master index Q1 2018 to Q4 2018
+python download_index.py  2018 2018
+```
+
+
+
+
+### Filtering Index File Based on a Stock List
+
+
+
+
 
 
 ## Introduction

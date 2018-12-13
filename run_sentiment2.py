@@ -32,6 +32,8 @@ def get_words_in_mda(mda):
 def get_word_features(wordlist):
     wordlist= nltk.FreqDist(wordlist)  # wordlist contains frequencies
     word_features = wordlist.keys()
+    # only use word features in Loughran McDonald
+
     return word_features
 
 
@@ -53,6 +55,12 @@ if __name__ == '__main__':
     mda_file = sys.argv[1]
     pct_training_data = float(sys.argv[2])
 
+    # define word features based on words identified by Loughran McDonald
+    # download master dictionary - isolate only positive and negative words
+    MASTER_DICT = pd.read_excel("master_dictionary.xlsx")
+    wordlist = MASTER_DICT.loc[(MASTER_DICT['Negative']!= 0) | (MASTER_DICT['Positive']!= 0) ]['Word']
+    word_features = get_word_features(wordlist.tolist())
+
     # mda file consists of word_list and sentiment
     with open('stock_files/mda_reports/' + mda_file,'rb') as f:
         mda = pickle.load(f)
@@ -63,8 +71,8 @@ if __name__ == '__main__':
     # randomize the list
     random.shuffle(mda)
 
-    # define word list
-    word_features = get_word_features(get_words_in_mda(mda))
+    #word_features = get_word_features(get_words_in_mda(mda))
+    
     # define training set
     training_set= nltk.classify.apply_features(extract_features, mda[0:int(len(mda) * pct_training_data)] )
     # define test set
@@ -121,6 +129,13 @@ if __name__ == '__main__':
     print("Losistic Regression classifier  precision:", precision_lr, "recall:", recall_lr, "f1-score:", f_lr)
     print("SGD classifier precision:", precision_sgd, "recall:", recall_sgd, "f1-score:", f_sgd)
     print("SVC classifier precision:", precision_svc, "recall:", recall_svc, "f1-score:", f_svc)
+
+    print("Naive Bayes classifier  accuracy pct:", (nltk.classify.accuracy(classifier_nb, test_set))*100)
+    print("Multinomial Naive Bayes classifier accuracy pct:", (nltk.classify.accuracy(classifier_mnb, test_set))*100)
+    print("Bernoulli Naive Bayes  accuracy pct:", (nltk.classify.accuracy(classifier_bnb, test_set))*100)
+    print("Losistic Regression classifier  accuracy pct:", (nltk.classify.accuracy(classifier_lr, test_set))*100)
+    print("SGD classifier accuracy pct:", (nltk.classify.accuracy(classifier_sgd, test_set))*100)
+    print("SVC classifier accuracy pct:", (nltk.classify.accuracy(classifier_svc, test_set))*100)
 
     # save classifiers for future use
     with open('stock_files/mda_reports/classifiers.pickle', 'wb') as f:

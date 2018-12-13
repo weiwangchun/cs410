@@ -19,25 +19,58 @@ This projects extracts management discussion and analysis (MD&A) sections of tex
 The project is broken several files based on the steps involved conducting sentiment analysis on SEC filings.
 
 ### Downloading Index File from EDGAR
+
 This python file extracts the quarterly master index files from EDGAR.
 It then isolates the 10K and 10Q reports from the master index as saves it in a news index file. 
 Finally, it cleans up existing master index files from the directory, as they get quite big.
 
-For example:
+For example, downloading the master index Q1 2017 to Q4 2018:
 ```
-# downloading master index Q1 2017 to Q4 2018
-python download_index.py  2017 2018
-# downloading master index Q1 2018 to Q4 2018
-python download_index.py  2018 2018
+>python download_index.py  2017 2018
 ```
 
+For example, downloading master index Q1 2018 to Q4 2018:
+```
+>python download_index.py  2018 2018
+```
 
+You can find resulting index file in `index_files/10X-yyyy-yyyy.idx`.
+
+```
+CIK|Company Name|Form Type|Date Filed|Filename
+--------------------------------------------------------------------------------
+100517|United Continental Holdings, Inc.|10-K|2017-02-23|edgar/data/100517/0001193125-17-054129.txt
+1019737|NAVIGANT CONSULTING INC|10-K|2017-02-17|edgar/data/1019737/0001193125-17-047900.txt
+1024725|TENNECO INC|10-K|2017-02-24|edgar/data/1024725/0001024725-17-000005.txt
+1037976|JONES LANG LASALLE INC|10-K|2017-02-23|edgar/data/1037976/0001037976-17-000012.txt
+10456|BAXTER INTERNATIONAL INC|10-K|2017-02-23|edgar/data/10456/0001564590-17-002240.txt
+```
+CIK are unique company identifiers used by the SEC. The index file also provides company name, date, form type and filename.
 
 
 ### Filtering Index File Based on a Stock List
 
+The EDAGR indices provide us with filings of all the listed companies in the US. 
+Running sentiment analysis on all the companies by downloading and reading through their annual (10K) and quarterly (10Q) reports will take a very long time.
+The `filter_index.py` function provides users with the ability to narrow down the filings to selected filings based on a stock list.
 
+In our example, we want to only look at Illinois based companies. This is saved in a file called `stock_list_illinois.csv`
 
+The contents of the file are as follows:
+```
+CIK,Ticker,Name,Exchange,SIC,Business,Incorporated
+--------------------------------------------------
+1551152,ABBV,Abbvie Inc,NYSE,2834,IL,DE
+1800,ABT,Abbott Laboratories,NYSE,2834,IL,IL
+1529377,ACRE,Ares Commercial Real Estate Corp,NYSE,6798,IL,MD
+```
+The key fields we require are the CIK identifier and the Ticker.
+
+To filter all the 10Q and 10K reports for ones that are based in Illinois, we would use:
+
+```
+>python filter_index.py stock_list_illinois.csv index_files/10X-2017-2018.idx
+```
 
 
 

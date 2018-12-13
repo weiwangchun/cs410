@@ -131,12 +131,29 @@ We have collected 445 MD&As and their respective stock market reactions. (Ideall
 
 ### 5. Run sentiment using `run_sentiment.py`
 
-Now we can run sentiment analysis using 6 different types of classifiers (Naive Bayes, Multinomial Naive Bayes, Bernoulli Naive Bayes, Losistic Regression, Stochastic Gradient Descent, Linear SVC) from the nltk package in Python.
+Now we can run sentiment analysis using 6 different types of classifiers (Naive Bayes, Multinomial Naive Bayes, Bernoulli Naive Bayes, Losistic Regression, Stochastic Gradient Descent, Linear SVC) from the nltk package in Python. `run_sentiment.py` runs a horse race between the 6 classifiers and outputs accuracy, precision, recall and the F1 score. It allows you to input the percentage of observations you want as training set. It also randomizes the observations / tuples. The word features we use is based on positive and negative financial words in  Loughran McDonald Financial Dictionary https://sraf.nd.edu/textual-analysis/.
+
+Overall, we find that the accuracies of the classifiers range between 50% to 60%, with the f1 score ranging between 0.4 to 0.6. We generally find the Linear SVC and the SGD classifier to be marginally better than the other classifiers.  
 
 
-
-For instance, 
+For instance, using 80% of the observations for training, and the remaining 20% for testing.
 ```
  >python run_sentiment.py mda.pickle 0.80
 ```
 
+If we're using the ready made `mda_illinois.pickle` it would be:
+
+```
+ >python run_sentiment.py mda_illinois.pickle 0.80
+```
+
+Resulting classifiers are saved in: `stock_files/mda_reports/classifiers.pickle`.
+
+
+After unpickling, to use it to run on an individual report, you could for example:
+
+```
+    with open('stock_files/mda_reports/52795_ANIXTER INTERNATIONAL INC_10-K_2017-02-23.txt', 'r') as myfile:
+        data=myfile.read().replace('\n', '')
+    classifier_svc.classify(extract_features(data.split()))
+```

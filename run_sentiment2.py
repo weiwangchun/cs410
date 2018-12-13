@@ -99,27 +99,27 @@ if __name__ == '__main__':
 
     # work out precision, recall and f scores
     recall_nb = nltk.classify.accuracy(classifier_nb, positive_test) 
-    precision_nb = ((1 - nltk.classify.accuracy(classifier_nb, negative_test)) * len(negative_test)) / (recall_nb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_nb, negative_test)) * len(negative_test))
+    precision_nb = (recall_nb * len(positive_test)) / (recall_nb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_nb, negative_test)) * len(negative_test))
     f_nb = (2*recall_nb*precision_nb)/(recall_nb + precision_nb)
 
     recall_mnb = nltk.classify.accuracy(classifier_mnb, positive_test) 
-    precision_mnb = ((1 - nltk.classify.accuracy(classifier_mnb, negative_test)) * len(negative_test)) / (recall_mnb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_mnb, negative_test)) * len(negative_test))
+    precision_mnb = (recall_mnb * len(positive_test)) / (recall_mnb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_mnb, negative_test)) * len(negative_test))
     f_mnb = (2*recall_mnb*precision_mnb)/(recall_mnb + precision_mnb)
 
     recall_bnb = nltk.classify.accuracy(classifier_bnb, positive_test) 
-    precision_bnb = ((1 - nltk.classify.accuracy(classifier_bnb, negative_test)) * len(negative_test)) / (recall_bnb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_bnb, negative_test)) * len(negative_test))
+    precision_bnb = (recall_bnb * len(positive_test)) / (recall_bnb * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_bnb, negative_test)) * len(negative_test))
     f_bnb = (2*recall_bnb*precision_bnb)/(recall_bnb + precision_bnb)
 
     recall_lr = nltk.classify.accuracy(classifier_lr, positive_test) 
-    precision_lr = ((1 - nltk.classify.accuracy(classifier_lr, negative_test)) * len(negative_test)) / (recall_lr * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_lr, negative_test)) * len(negative_test))
+    precision_lr = (recall_lr * len(positive_test)) / (recall_lr * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_lr, negative_test)) * len(negative_test))
     f_lr = (2*recall_lr*precision_lr)/(recall_lr + precision_lr)
 
     recall_sgd = nltk.classify.accuracy(classifier_sgd, positive_test) 
-    precision_sgd = ((1 - nltk.classify.accuracy(classifier_sgd, negative_test)) * len(negative_test)) / (recall_sgd * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_sgd, negative_test)) * len(negative_test))
+    precision_sgd = (recall_sgd * len(positive_test)) / (recall_sgd * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_sgd, negative_test)) * len(negative_test))
     f_sgd = (2*recall_sgd*precision_sgd)/(recall_sgd + precision_sgd)
 
     recall_svc = nltk.classify.accuracy(classifier_svc, positive_test) 
-    precision_svc = ((1 - nltk.classify.accuracy(classifier_svc, negative_test)) * len(negative_test)) / (recall_svc * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_svc, negative_test)) * len(negative_test))
+    precision_svc = (recall_svc * len(positive_test)) / (recall_svc * len(positive_test) +  (1 - nltk.classify.accuracy(classifier_svc, negative_test)) * len(negative_test))
     f_svc = (2*recall_svc*precision_svc)/(recall_svc + precision_svc)
 
     # test sample accuracy

@@ -224,6 +224,7 @@ After unpickling, to use it to run on an individual report, you could for exampl
 
 ## Contribution of Team Members
 * Extraction of MD&A files (`download_index.py`, `filter_index.py`, `download_mda.py`): Wang Chun Wei
+* Extraction of stock market sentiment (`download_prices.py`): Wang Chun Wei
 * Sentiment Analysis (`run_sentiment.py`): Venkat Rao , Wang Chun Wei
 * Short Video Presentation: Wang Chun Wei 
 * Tech Review: Venkat Rao , Wang Chun Wei

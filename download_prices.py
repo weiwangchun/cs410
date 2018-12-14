@@ -10,8 +10,8 @@ import sys
 import wrds
 import csv
 import datetime as dt
-import matplotlib.pyplot as plt
-from matplotlib import style
+#import matplotlib.pyplot as plt
+#from matplotlib import style
 import pandas as pd
 #import pandas_datareader.data as web
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         if counter == 1:
             returns = tmp
         else:
-            returns  = pd.merge(returns, tmp, on ='Date')
+            returns  = pd.merge(returns, tmp, on ='Date', how = 'outer')
 
     # get S&P Composite Return - proxy for index
     tmp = db.raw_sql("select date, sprtrn from crsp.dsi where date > '" + start_date + "'")

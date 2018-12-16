@@ -241,7 +241,7 @@ if __name__ == '__main__':
     CIK_TICKER_MAP = pd.read_csv(stock_file)
     # stock excess returns
     EXCESSRET = pd.read_csv('stock_files/ExcessRet_of_' + stock_file)
-    # downloard master dictionary
+    # download master dictionary
     MASTER_DICT = pd.read_excel("master_dictionary.xlsx")
 
 

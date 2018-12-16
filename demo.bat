@@ -2,7 +2,7 @@
 echo '###################################################################################################'
 echo 'Requires Python 3'
 echo 'DEAR EXAMINER: If python is not recognized error occurs, the directory needs to be specified.'
-echo 'For me it was: "C:\ProgramData\Anacondas3\python download_index.py 2018 2018" instead of simply "python download_index.py 2018 2018"'
+echo 'For me it was: "C:\ProgramData\Anaconda3\python download_index.py 2018 2018" instead of simply "python download_index.py 2018 2018"'
 echo '###################################################################################################'
 
 echo 'Downloading Index Files from SEC EDGAR'
@@ -22,6 +22,7 @@ pause
 @echo off
 echo '###################################################################################################'
 echo 'Run sentiment analysis on existing downloaded mda files in mda_illinois.pickle'
+echo 'We can't use the MDAs we just collected because its too small'
 @echo on
-python run_sentiment.py mda.pickle 0.80
+python run_sentiment.py mda_illinois.pickle 0.80
 pause
